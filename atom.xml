@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[朝花夕拾]]></title>
+  <link href="http://www.cooya.org/atom.xml" rel="self"/>
+  <link href="http://www.cooya.org/"/>
+  <updated>2013-09-10T16:37:49+08:00</updated>
+  <id>http://www.cooya.org/</id>
+  <author>
+    <name><![CDATA[Harw]]></name>
+    <email><![CDATA[lixiao0617@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[hello world]]></title>
+    <link href="http://www.cooya.org/blog/2013/09/10/hello-world/"/>
+    <updated>2013-09-10T16:33:00+08:00</updated>
+    <id>http://www.cooya.org/blog/2013/09/10/hello-world</id>
+    <content type="html"><![CDATA[<h2>Hello World</h2>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://www.cooya.org/blog/2013/09/10/hello-world/</loc>
+        <lastmod>2013-09-10T16:34:05+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.cooya.org/blog/archives/</loc>
+        <lastmod>2013-09-10T16:34:05+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.cooya.org/</loc>
+        <lastmod>2013-09-10T16:34:05+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.cooya.org/robots.txt</loc>
+        <lastmod>2013-09-10T16:29:43+08:00</lastmod>
+    </url>
+</urlset>
