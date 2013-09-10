@@ -4,7 +4,7 @@
   <title><![CDATA[朝花夕拾]]></title>
   <link href="http://www.cooya.org/atom.xml" rel="self"/>
   <link href="http://www.cooya.org/"/>
-  <updated>2013-09-10T17:24:09+08:00</updated>
+  <updated>2013-09-10T17:51:06+08:00</updated>
   <id>http://www.cooya.org/</id>
   <author>
     <name><![CDATA[Harw]]></name>
@@ -18,7 +18,7 @@
     <link href="http://www.cooya.org/blog/2013/09/10/test-blog/"/>
     <updated>2013-09-10T17:22:00+08:00</updated>
     <id>http://www.cooya.org/blog/2013/09/10/test-blog</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<p>test blog</p>
 ]]></content>
   </entry>
   
