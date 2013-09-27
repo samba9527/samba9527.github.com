@@ -7,7 +7,7 @@
 	<meta name="author" content="Harw">
 
 	
-	<meta name="description" content=" Hello World Sep 10th, 2013 ">
+	<meta name="description" content="处理影响业务的SQL 早上刚到公司同事反映一个交易后台出现访问很慢的情况，查询后发现出现瓶颈的是mysql。 了解到是业务在做活动（这个平台用户平时并发不会像今天这样爆发），于是查最近几个小时的mysql慢查询日志记录（分析工具为mysqlsla），发现其中占慢查询比重最大的几条语句。 &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -24,18 +24,16 @@
 <body>
 	<header id="header" class="inner"><h1><a href="/">朝花夕拾</a></h1>
 <nav id="main-nav"><ul class="main">
-        <li><a href="/">Blog</a></li>
-        <li><a href="/blog/archives">Archives</a></li>
-        <li><a href="/about">About me</a></li>
+        <li><a href="/blog/archives">archives</a></li>
+        <li><a href="/about">about me</a></li>
 </ul>
 </nav>
 <nav id="mobile-nav">
 	<div class="alignleft menu">
 		<a class="button">Menu</a>
 		<div class="container"><ul class="main">
-        <li><a href="/">Blog</a></li>
-        <li><a href="/blog/archives">Archives</a></li>
-        <li><a href="/about">About me</a></li>
+        <li><a href="/blog/archives">archives</a></li>
+        <li><a href="/about">about me</a></li>
 </ul>
 </div>
 	</div>
@@ -81,12 +79,115 @@
     <article class="post">
 	<h2 class="title">
 		
-		<a href="/blog/2013/09/10/hello-world/">
+		<a href="/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql/">
 		
-			Hello World</a>
+			处理影响业务的SQL</a>
 	</h2>
 	<div class="entry-content">
-		<h2>Hello World</h2>
+		<h2>处理影响业务的SQL</h2>
+
+<hr />
+
+<p>早上刚到公司同事反映一个交易后台出现访问很慢的情况，查询后发现出现瓶颈的是mysql。</p>
+
+
+<p></p>了解到是业务在做活动（这个平台用户平时并发不会像今天这样爆发），于是查最近几个小时的mysql慢查询日志记录（分析工具为<a href="http://hackmysql.com/mysqlsla">mysqlsla</a>），发现其中占慢查询比重最大的几条语句。反映给项目经理，分析后是今天活动的业务逻辑调用最多的，平时使用没有发现异常，但是在并发突然增大的时候，就显现出不足的地方。以下是近几个小时的mysql慢查询记录。</p></p>
+
+<p>排名第一：4.37k  (占总量的18.74%)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT SUM(orders.buynum) AS totalbuynum 
+</span><span class='line'>FROM telecom.orders 
+</span><span class='line'>WHERE orders.siteid = 'S' AND orders.productid = 'S' AND orders.orderstatus &lt;&gt; 'S' AND orders.agentid = 'S' AND orders.supplierid = 'S' AND orders.addtime &gt;= 'S' 
+</span><span class='line'>LIMIT N, N;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>排名第二：1.69k  (7.25%)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT COUNT(*) 
+</span><span class='line'>FROM telecom.orders
+</span><span class='line'>WHERE orders.siteid = 'S' AND orders.agentid = 'S' AND orders.orderstatus &lt;&gt; 'S' 
+</span><span class='line'>ORDER BY orders.addtime DESC;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>排名第三：1.63k  (7.00%)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT orders.id,orders.id,orders.siteid,orders.ordersn,orders.productid,orders.productname,orders.agentid,orders.supplierid,orders.parentid,orders.paytotelecomid,
+</span><span class='line'>orders.supplyprice,orders.buynum,orders.istimelypay,orders.booknum,orders.receivednum,orders.shippednum,orders.refundednum,orders.shippedstatus,orders.receivedstatus,
+</span><span class='line'>orders.orderamount,orders.payamount,orders.totalbatchamount,orders.balanceamount,orders.addtime,orders.paytime,orders.receivetime,orders.paytosupplierpaymentid,
+</span><span class='line'>orders.orderstatus,orders.paystatus,orders.shippingstatus,orders.policycontent,orders.remark,orders.systemlog,orders.paymentcode,orders.extendinfo1,orders.addressregionid,
+</span><span class='line'>orders.consignee,orders.addressregion,orders.consigneeaddress,orders.consigneephone,orders.consigneemobile,orders.consigneezipcode,agents.agentname,products.brandid,
+</span><span class='line'>products.salesguideprice,agents.invoicetype,agents.regionid,suppliers.suppliername,suppliers.shippingexplanation,products.productcateid 
+</span><span class='line'>FROM telecom.orders 
+</span><span class='line'>LEFT JOIN telecom.agents 
+</span><span class='line'>  ON agents.id=orders.agentid 
+</span><span class='line'>LEFT JOIN telecom.products 
+</span><span class='line'>  ON products.id=orders.productid 
+</span><span class='line'>LEFT JOIN telecom.suppliers 
+</span><span class='line'>  ON suppliers.id=orders.supplierid
+</span><span class='line'>WHERE orders.siteid = 'S' AND orders.agentid = 'S' AND orders.orderstatus &lt;&gt; 'S'
+</span><span class='line'>ORDER BY orders.addtime DESC
+</span><span class='line'>LIMIT N, N;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>排名第四：1.03k  (4.44%)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT balancerecords.id,balancerecords.id,balancerecords.siteid,balancerecords.agentid,balancerecords.supplierid,balancerecords.tradeamount,balancerecords.newamount,
+</span><span class='line'>balancerecords.lockamount,balancerecords.shppingrecordid,balancerecords.operatetype,balancerecords.orderid,balancerecords.priceprotectionid,balancerecords.priceprotectionapplyid,
+</span><span class='line'>balancerecords.refundid,balancerecords.remark,balancerecords.ismanual,balancerecords.addtime,balancerecords.rebatelogid,suppliers.suppliername,agents.agentname,agents.regionid,
+</span><span class='line'>agents.rebatelevel FROM telecom.balancerecords LEFT JOIN telecom.suppliers ON suppliers.id=balancerecords.supplierid LEFT JOIN telecom.agents ON agents.id=balancerecords.agentid 
+</span><span class='line'>WHERE balancerecords.siteid = 'S' AND balancerecords.agentid = 'S' AND balancerecords.supplierid = 'S'
+</span><span class='line'>ORDER BY balancerecords.id DESC
+</span><span class='line'>LIMIT N, N;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后使用<a href="http://dev.mysql.com/doc/refman/5.1/en/mysqlslap.html">mysqlslap</a>对mysql进行压力测试，判断哪个语句对数据库的摧残程度最大，发现第一条和第三条直接造成服务器load剧烈升高，影响业务。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/mysql-5.1.50/bin/mysqlslap  --concurrency=270,280 --number-of-queries 560 --debug-info -u root -p -h 127.0.0.1 --query=/root/aa.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里的&mdash;query指定要测试的sql，这个文件可以自己定义，我这里定义的是慢查询最多的语句。</p>
+
+<p>要做这个压力测试操作，首先需要在数据里建立一个SCHEMA，使用完成之后删除它。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>create SCHEMA mysqlslap;
+</span><span class='line'>drop SCHEMA mysqlslap;</span></code></pre></td></tr></table></div></figure>
+
+
+
 
 		
 		
@@ -106,8 +207,12 @@
   
 
 
-<time datetime="2013-09-10T16:33:00+08:00" pubdate data-updated="true">Sep 10<span>th</span>, 2013</time></div>
+<time datetime="2013-09-27T10:30:00+08:00" pubdate data-updated="true">Sep 27<span>th</span>, 2013</time></div>
 	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/mysql/'>mysql</a>
+
 
 </div>
 	

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: mysql | 朝花夕拾]]></title>
+  <link href="http://www.cooya.org/blog/categories/mysql/atom.xml" rel="self"/>
+  <link href="http://www.cooya.org/"/>
+  <updated>2013-09-27T13:05:59+08:00</updated>
+  <id>http://www.cooya.org/</id>
+  <author>
+    <name><![CDATA[Harw]]></name>
+    <email><![CDATA[lixiao0617@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[处理影响业务的SQL]]></title>
+    <link href="http://www.cooya.org/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql/"/>
+    <updated>2013-09-27T10:30:00+08:00</updated>
+    <id>http://www.cooya.org/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql</id>
+    <content type="html"><![CDATA[<h2>处理影响业务的SQL</h2>
+
+<hr />
+
+<p>早上刚到公司同事反映一个交易后台出现访问很慢的情况，查询后发现出现瓶颈的是mysql。</p>
+
+
+<p></p>了解到是业务在做活动（这个平台用户平时并发不会像今天这样爆发），于是查最近几个小时的mysql慢查询日志记录（分析工具为<a href="http://hackmysql.com/mysqlsla">mysqlsla</a>），发现其中占慢查询比重最大的几条语句。反映给项目经理，分析后是今天活动的业务逻辑调用最多的，平时使用没有发现异常，但是在并发突然增大的时候，就显现出不足的地方。以下是近几个小时的mysql慢查询记录。</p></p>
+
+<p>排名第一：4.37k  (占总量的18.74%)</p>
+
+<p><code>
+SELECT SUM(orders.buynum) AS totalbuynum
+FROM telecom.orders
+WHERE orders.siteid = 'S' AND orders.productid = 'S' AND orders.orderstatus &lt;&gt; 'S' AND orders.agentid = 'S' AND orders.supplierid = 'S' AND orders.addtime &gt;= 'S'
+LIMIT N, N;
+</code></p>
+
+<p>排名第二：1.69k  (7.25%)</p>
+
+<p><code>
+SELECT COUNT(*)
+FROM telecom.orders
+WHERE orders.siteid = 'S' AND orders.agentid = 'S' AND orders.orderstatus &lt;&gt; 'S'
+ORDER BY orders.addtime DESC;
+</code></p>
+
+<p>排名第三：1.63k  (7.00%)</p>
+
+<p>```
+SELECT orders.id,orders.id,orders.siteid,orders.ordersn,orders.productid,orders.productname,orders.agentid,orders.supplierid,orders.parentid,orders.paytotelecomid,
+orders.supplyprice,orders.buynum,orders.istimelypay,orders.booknum,orders.receivednum,orders.shippednum,orders.refundednum,orders.shippedstatus,orders.receivedstatus,
+orders.orderamount,orders.payamount,orders.totalbatchamount,orders.balanceamount,orders.addtime,orders.paytime,orders.receivetime,orders.paytosupplierpaymentid,
+orders.orderstatus,orders.paystatus,orders.shippingstatus,orders.policycontent,orders.remark,orders.systemlog,orders.paymentcode,orders.extendinfo1,orders.addressregionid,
+orders.consignee,orders.addressregion,orders.consigneeaddress,orders.consigneephone,orders.consigneemobile,orders.consigneezipcode,agents.agentname,products.brandid,
+products.salesguideprice,agents.invoicetype,agents.regionid,suppliers.suppliername,suppliers.shippingexplanation,products.productcateid
+FROM telecom.orders
+LEFT JOIN telecom.agents</p>
+
+<pre><code>ON agents.id=orders.agentid 
+</code></pre>
+
+<p>LEFT JOIN telecom.products</p>
+
+<pre><code>ON products.id=orders.productid 
+</code></pre>
+
+<p>LEFT JOIN telecom.suppliers</p>
+
+<pre><code>ON suppliers.id=orders.supplierid
+</code></pre>
+
+<p>WHERE orders.siteid = &rsquo;S' AND orders.agentid = &rsquo;S' AND orders.orderstatus &lt;> &rsquo;S'
+ORDER BY orders.addtime DESC
+LIMIT N, N;
+```
+排名第四：1.03k  (4.44%)</p>
+
+<p><code>
+SELECT balancerecords.id,balancerecords.id,balancerecords.siteid,balancerecords.agentid,balancerecords.supplierid,balancerecords.tradeamount,balancerecords.newamount,
+balancerecords.lockamount,balancerecords.shppingrecordid,balancerecords.operatetype,balancerecords.orderid,balancerecords.priceprotectionid,balancerecords.priceprotectionapplyid,
+balancerecords.refundid,balancerecords.remark,balancerecords.ismanual,balancerecords.addtime,balancerecords.rebatelogid,suppliers.suppliername,agents.agentname,agents.regionid,
+agents.rebatelevel FROM telecom.balancerecords LEFT JOIN telecom.suppliers ON suppliers.id=balancerecords.supplierid LEFT JOIN telecom.agents ON agents.id=balancerecords.agentid
+WHERE balancerecords.siteid = 'S' AND balancerecords.agentid = 'S' AND balancerecords.supplierid = 'S'
+ORDER BY balancerecords.id DESC
+LIMIT N, N;
+</code></p>
+
+<p>然后使用<a href="http://dev.mysql.com/doc/refman/5.1/en/mysqlslap.html">mysqlslap</a>对mysql进行压力测试，判断哪个语句对数据库的摧残程度最大，发现第一条和第三条直接造成服务器load剧烈升高，影响业务。</p>
+
+<p><code>
+/usr/local/mysql-5.1.50/bin/mysqlslap  --concurrency=270,280 --number-of-queries 560 --debug-info -u root -p -h 127.0.0.1 --query=/root/aa.sql
+</code></p>
+
+<p>这里的&mdash;query指定要测试的sql，这个文件可以自己定义，我这里定义的是慢查询最多的语句。</p>
+
+<p>要做这个压力测试操作，首先需要在数据里建立一个SCHEMA，使用完成之后删除它。</p>
+
+<p><code>
+create SCHEMA mysqlslap;
+drop SCHEMA mysqlslap;
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>
