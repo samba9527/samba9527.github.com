@@ -7,7 +7,7 @@
 	<meta name="author" content="Harw">
 
 	
-	<meta name="description" content="处理影响业务的SQL 早上刚到公司同事反映一个交易后台出现访问很慢的情况，查询后发现出现瓶颈的是mysql。 了解到是业务在做活动（这个平台用户平时并发不会像今天这样爆发），于是查最近几个小时的mysql慢查询日志记录（分析工具为mysqlsla），发现其中占慢查询比重最大的几条语句。 &hellip;">
+	<meta name="description" content="早上刚到公司同事反映一个交易后台出现访问很慢的情况，查询后发现出现瓶颈的是mysql。 了解到是业务在做活动（这个平台用户平时并发不会像今天这样爆发），于是查最近几个小时的mysql慢查询日志记录（分析工具为mysqlsla），发现其中占慢查询比重最大的几条语句。反映给项目经理， &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -75,7 +75,7 @@
 	
 	<div id="content" class="inner"><article class="post">
 	<h2 class="title">处理影响业务的SQL</h2>
-	<div class="entry-content"><h2>处理影响业务的SQL</h2>
+	<div class="entry-content"><hr />
 
 <hr />
 
@@ -94,6 +94,9 @@
 </span><span class='line'>FROM telecom.orders 
 </span><span class='line'>WHERE orders.siteid = 'S' AND orders.productid = 'S' AND orders.orderstatus &lt;&gt; 'S' AND orders.agentid = 'S' AND orders.supplierid = 'S' AND orders.addtime &gt;= 'S' 
 </span><span class='line'>LIMIT N, N;</span></code></pre></td></tr></table></div></figure>
+
+
+<!--more-->
 
 
 <p>排名第二：1.69k  (7.25%)</p>
@@ -255,6 +258,18 @@
 
 
 
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-9804596-3']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
 
 
 

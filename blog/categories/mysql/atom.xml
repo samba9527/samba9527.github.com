@@ -4,7 +4,7 @@
   <title><![CDATA[Category: mysql | 朝花夕拾]]></title>
   <link href="http://www.cooya.org/blog/categories/mysql/atom.xml" rel="self"/>
   <link href="http://www.cooya.org/"/>
-  <updated>2013-09-27T15:06:13+08:00</updated>
+  <updated>2013-09-27T16:21:04+08:00</updated>
   <id>http://www.cooya.org/</id>
   <author>
     <name><![CDATA[Harw]]></name>
@@ -18,7 +18,7 @@
     <link href="http://www.cooya.org/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql/"/>
     <updated>2013-09-27T10:30:00+08:00</updated>
     <id>http://www.cooya.org/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql</id>
-    <content type="html"><![CDATA[<h2>处理影响业务的SQL</h2>
+    <content type="html"><![CDATA[<hr />
 
 <hr />
 
@@ -35,6 +35,9 @@ FROM telecom.orders
 WHERE orders.siteid = 'S' AND orders.productid = 'S' AND orders.orderstatus &lt;&gt; 'S' AND orders.agentid = 'S' AND orders.supplierid = 'S' AND orders.addtime &gt;= 'S'
 LIMIT N, N;
 </code></p>
+
+<!--more-->
+
 
 <p>排名第二：1.69k  (7.25%)</p>
 
