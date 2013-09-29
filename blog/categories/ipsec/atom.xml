@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ipsec | 朝花夕拾]]></title>
   <link href="http://www.cooya.org/blog/categories/ipsec/atom.xml" rel="self"/>
   <link href="http://www.cooya.org/"/>
-  <updated>2013-09-29T17:04:51+08:00</updated>
+  <updated>2013-09-29T18:00:54+08:00</updated>
   <id>http://www.cooya.org/</id>
   <author>
     <name><![CDATA[Harw]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[增强网络安全性-实现l2tp+ipsec]]></title>
+    <title type="html"><![CDATA[增强网络健壮性-实现l2tp+ipsec类型VPN]]></title>
     <link href="http://www.cooya.org/blog/2013/09/29/zeng-qiang-wang-luo-an-quan-xing-shi-xian-l2tp-plus-ipsec/"/>
     <updated>2013-09-29T15:49:00+08:00</updated>
     <id>http://www.cooya.org/blog/2013/09/29/zeng-qiang-wang-luo-an-quan-xing-shi-xian-l2tp-plus-ipsec</id>
