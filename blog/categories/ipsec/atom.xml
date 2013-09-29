@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ipsec | 朝花夕拾]]></title>
+  <link href="http://www.cooya.org/blog/categories/ipsec/atom.xml" rel="self"/>
+  <link href="http://www.cooya.org/"/>
+  <updated>2013-09-29T17:04:51+08:00</updated>
+  <id>http://www.cooya.org/</id>
+  <author>
+    <name><![CDATA[Harw]]></name>
+    <email><![CDATA[lixiao0617@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[增强网络安全性-实现l2tp+ipsec]]></title>
+    <link href="http://www.cooya.org/blog/2013/09/29/zeng-qiang-wang-luo-an-quan-xing-shi-xian-l2tp-plus-ipsec/"/>
+    <updated>2013-09-29T15:49:00+08:00</updated>
+    <id>http://www.cooya.org/blog/2013/09/29/zeng-qiang-wang-luo-an-quan-xing-shi-xian-l2tp-plus-ipsec</id>
+    <content type="html"><![CDATA[<hr />
+
+<h3>应用及介绍</h3>
+
+<p>对于电子商务行业来说，网络安全越来越显得重要，所以公司业务平台使用了硬件防火墙对网络流量进行过滤(当然不限于这一种防护)，防火墙上只开启了业务服务端口。对于对防火墙之后的服务器系统管理等操作，必须连通VPN才能操作。且每种VPN类型都必须支持记录登录详细日志，并能做到访问控制细化，某一类用户只能访问特定的网络资源。</p>
+
+<p>为使用户方便管理服务器，目前实现的VPN方式有以下几种以满足不同需求：<br>
+1. <a href="http://www.xelerance.com/wp-content/uploads/software/xl2tpd/xl2tpd-1.3.0.tar.gz">xl2tp</a> + <a href="ftp://ftp.openswan.org/openswan/openswan-2.6.38.tar.gz">ipsec</a>         &#8194;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;             支持移动终端设备，兼容性更好些<br>
+2. <a href="http://openvpn.net">openvpn</a> + <a href="http://freeradius.org/">freeradius</a> + <a href="http://www.mysql.com/">mysql</a>      &#8195;&#8195; 支持openvpn客户端<br>
+3. <a href="http://www.cisco.com/">cisco client vpn</a>      &#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8194;             客户需要安装软件<br></p>
+
+<p>本篇只介绍xl2tp和ipsec结合类型的VPN，此种VPN的妙处不可言，不可言&hellip;&hellip;  <br>
+其他两种VPN类型以后再单独列篇介绍。</p>
+
+<br>
+
+
+<!--more-->
+
+
+<hr />
+
+<h3>L2TP + IPSEC 简介：</h3>
+
+<p>l2tp是第2层隧道协议，其可以为跨越面向数据包的媒体发送点到点协议框架提供封装。pptp是点对点隧道协议，PPTP和L2TP都是用PPP协议对数据进行封装，然后添加附加包头用于数据在互联网络上的传输，PPTP只能在两端点间建立单一隧道，L2TP支持在两端点间使用多隧道。L2TP可以提供隧道验证，而PPTP则不支持隧道验证。但是当L2TP和IPSEC共同使用时，可以由IPSEC提供隧道验证，不需要在第二层协议上验证隧道使用L2TP。PPTP要求互联网络为IP网络。L2TP只要求隧道媒介提供面向数据包的点对点的连接，L2TP可以在IP等多种网络工作。L2TP本身并不提供连接的安全性，但它可以依赖PPP提供的认证，因此具有PPP所具有的安全特性。L2TP本质上一种隧道传输协议，它使用两种类型的消息，控制消息和数据隧道消息。控制消息负责创建，维护，终止L2TP隧道，而数据隧道消息则负责用户数据的真正传输。L2TP所依赖的PPP可以进行用户的身份认证，在安全性考虑上，L2TP仅定义了控制消息的加密传输方式，对传输中的数据并不加密。<br></p>
+
+<p>L2TP的特点:<br>
+1：灵活的身份验证机制及高度的安全性（数据加密需要使用其他的方式提供）<br>
+2：多协议传输，L2TP传输PPP数据包，在PPP数据包内科可以封装多种协议<br>
+3：支持RADIUS服务器的验证<br>
+4：支持内部地址分配<br>
+5：网络计费灵活<br>
+6：可靠性，L2TP支持备份LNS<br></p>
+
+<p>IPSEC隧道模式隧道是封装、路由与解封的整个过程。隧道将原始的数据包隐藏在心的数据包内部，该新的数据包可能会有新的寻址与路由信息，从而使其能通过网络传输。隧道与数据保密性结合使用，在网络上窃听通讯的人将无法获取原始数据包数据，封装的数据包到达目的地后会删除封装，原始数据包头用于将数据包路由到最终的目的地。</p>
+
+<br>
+
+
+<hr />
+
+<h3>组件依赖及安装：</h3>
+
+<p>首先下载 <a href="http://www.xelerance.com/wp-content/uploads/software/xl2tpd/xl2tpd-1.3.0.tar.gz">xl2tp</a> 和 <a href="ftp://ftp.openswan.org/openswan/openswan-2.6.38.tar.gz">openswan</a></p>
+
+<p>其次安装所需要的依赖组件(我的安装环境为centos 6.0)：<br>
+<code>
+yum install -y libpcap libpcap bison gpm-devel flex  gpm-static ppp
+</code></p>
+
+<p>至于使用何种方式安装，看个人爱好或者自己的平台包管理。</p>
+
+<h4>安装xl2tpd:<br></h4>
+
+<p>```
+cd /opt/vpn_soft
+tar xzf xl2tpd-1.3.0.tar.gz
+cd xl2tpd-1.3.0
+make
+make install</p>
+
+<p>cp examples/xl2tpd.conf /etc/
+cp examples/ppp-options.xl2tpd /etc/ppp/options.xl2tpd
+mkdir /var/run/xl2tpd
+```</p>
+
+<h4>安装openswan:<br></h4>
+
+<p><code>
+cd /opt/vpn_soft
+tar xzf openswan-2.6.37.tar.gz
+cd openswan-2.6.37
+make programs
+make install
+</code></p>
+
+<br>
+
+
+<hr />
+
+<h3>配置ipsec和xl2tp</h3>
+
+<br>
+
+
+<h4>配置ipsec</h4>
+
+<p>编辑/etc/ipsec.secrets 这个是ipsec的共享密钥文件，内容为
+<code>
+YOUR.SERVER.IP.ADDRESS      %any:       PSK  "YourShareSecret"
+</code></p>
+
+<p>编辑/etc/ipsec.conf 这个是openswan的配置文件</p>
+
+<p>```</p>
+
+<h1>/etc/ipsec.conf &ndash; Openswan IPsec configuration file</h1>
+
+<p>version 2.0     # conforms to second version of ipsec.conf specification
+config setup</p>
+
+<pre><code>    dumpdir=/var/run/pluto/
+    nat_traversal=yes
+    virtual_private=%v4:10.0.0.0/8,%v4:192.168.0.0/16,%v4:172.16.0.0/12
+    oe=off
+    protostack=netkey
+</code></pre>
+
+<h1>Add connections here</h1>
+
+<p>conn L2TP-PSK-NAT</p>
+
+<pre><code>    rightsubnet=vhost:%priv
+    also=L2TP-PSK-noNAT
+</code></pre>
+
+<p>conn L2TP-PSK-noNAT</p>
+
+<pre><code>    authby=secret
+    pfs=no
+    auto=add
+    keyingtries=3
+    rekey=no
+    ikelifetime=8h
+    keylife=1h
+    type=transport
+    left=YOUR.SERVER.IP.ADDRESS 
+    leftprotoport=17/1701
+    right=%any
+    rightprotoport=17/%any
+</code></pre>
+
+<p>```</p>
+
+<br>
+
+
+<h4>配置xl2tp</h4>
+
+<p>编辑/etc/xl2tpd.conf
+```
+[global]
+listen-addr = YOUR.SERVER.IP.ADDRESS
+ipsec saref = yes</p>
+
+<p>[lns default]
+ip range = 10.1.2.50-10.1.2.150
+local ip = 10.1.2.10
+refuse chap = yes
+refuse pap = yes
+require authentication = yes
+ppp debug = yes
+pppoptfile = /etc/ppp/options.xl2tpd
+length bit = yes
+```</p>
+
+<p>编辑/etc/ppp/chap-secrets
+<code>
+username       *       passwd    *
+</code></p>
+
+<p>编辑/etc/ppp/options.xl2tpd
+<code>
+require-mschap-v2
+ms-dns 8.8.4.4
+ms-dns 8.8.8.8
+asyncmap 0
+auth
+crtscts
+lock
+hide-password
+modem
+debug
+name l2tpd
+proxyarp
+lcp-echo-interval 30
+lcp-echo-failure 4
+mtu 1400
+noccp
+connect-delay 5000
+</code></p>
+
+<br>
+
+
+<p>以上完成了基础的安装及软件配置，但是网络的设置还没有完成，需要进行以下操作：
+```
+for each in /proc/sys/net/ipv4/conf/*; do echo 0 > $each/accept_redirects; echo 0 > $each/send_redirects; done
+echo &ldquo;1&rdquo; > /proc/sys/net/core/xfrm_larval_drop
+echo &ldquo;1&rdquo; > &ldquo;1&rdquo; > /proc/sys/net/ipv4/ip_forward
+iptable -t nat POSTROUTING -s 10.1.2.0/24 -j SNAT &mdash;to-source YOUR.SERVER.IP.ADDRESS</p>
+
+<p>```</p>
+
+<br>
+
+
+<hr />
+
+<h3>测试</h3>
+
+<p>用以下命令启动以验证ipsec是否正常。
+<code>
+/etc/init.d/ipsec start
+</code></p>
+
+<p>验证ipsec的安装及配置，应该显示如下图所示，没有问题就可以再启动xl2tp，出现问题的话查查日志记录应该有详细说明。
+<code>
+ipsec verify
+/usr/local/sbin/xl2tpd -c /etc/xl2tpd.conf
+</code>
+<img src="/static/ipsec.jpg" alt="ipsec" /></p>
+]]></content>
+  </entry>
+  
+</feed>
