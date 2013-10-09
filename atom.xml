@@ -4,7 +4,7 @@
   <title><![CDATA[朝花夕拾]]></title>
   <link href="http://www.cooya.org/atom.xml" rel="self"/>
   <link href="http://www.cooya.org/"/>
-  <updated>2013-09-29T18:00:54+08:00</updated>
+  <updated>2013-10-09T16:15:49+08:00</updated>
   <id>http://www.cooya.org/</id>
   <author>
     <name><![CDATA[Harw]]></name>
@@ -300,6 +300,14 @@
 
 
 <p><img src="http://www.cooya.org/static/ipsec.jpg" alt="ipsec" /></p>
+
+<p class='post-footer'>
+            原文地址:
+            <a href='http://www.cooya.org/blog/2013/09/29/zeng-qiang-wang-luo-an-quan-xing-shi-xian-l2tp-plus-ipsec/'>http://www.cooya.org/blog/2013/09/29/zeng-qiang-wang-luo-an-quan-xing-shi-xian-l2tp-plus-ipsec/</a><br/>
+            &nbsp;written by <a href='http://www.cooya.org'>Harw</a>
+            &nbsp;posted at <a href='http://www.cooya.org'>http://www.cooya.org</a>
+            </p>
+
 ]]></content>
   </entry>
   
@@ -414,6 +422,14 @@
 </span><span class='line'>drop SCHEMA mysqlslap;</span></code></pre></td></tr></table></div></figure>
 
 
+
+
+<p class='post-footer'>
+            原文地址:
+            <a href='http://www.cooya.org/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql/'>http://www.cooya.org/blog/2013/09/27/chu-li-ying-xiang-ye-wu-de-sql/</a><br/>
+            &nbsp;written by <a href='http://www.cooya.org'>Harw</a>
+            &nbsp;posted at <a href='http://www.cooya.org'>http://www.cooya.org</a>
+            </p>
 
 ]]></content>
   </entry>
